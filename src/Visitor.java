@@ -112,7 +112,7 @@ public class Visitor   extends gBaseVisitor<Object> {
                 String Folder_Path =  get_dir(table_name);
                 int[] indexes = get_indexes(select_columns,table_name);
                 int vars_count = get_vars_num(table_name);
-                String in_path = "";
+                String in_path = "";String out_path = "" ;
                 ArrayList tokens = new ArrayList() ;
                 Shuffle_output SO = new Shuffle_output();
                 if(Folder_Path != null)
@@ -128,7 +128,9 @@ public class Visitor   extends gBaseVisitor<Object> {
                             System.out.println("File " + listOfFile.getName());
                             System.out.println();
                             in_path = listOfFile.getPath();
-                            separate(in_path,",",indexes);
+                            out_path = out_dir+"\\"+listOfFile.getName()+"map_out";
+                            System.out.println(out_path);
+                            separate(in_path,",",indexes,out_path);
                             //try {
                               //  Map(indexes, tokens, vars_count, listOfFile.getName(), Folder_Path+"\\out");
                                 //print_Map(Folder_Path+"\\out",select_columns);
@@ -238,23 +240,32 @@ public class Visitor   extends gBaseVisitor<Object> {
         return -1 ;
     }
 
-    public void separate(String path , String Delimiter , int[] indexes)
+    public void separate(String in_path , String Delimiter , int[] indexes , String out_path)
     {
         BufferedReader fileReader = null;
         String[] tokens = null ;
         String line ;
+        String Final_Path = out_path+".txt";
         try
         {
-            fileReader = new BufferedReader(new FileReader(path));
+            fileReader = new BufferedReader(new FileReader(in_path));
+            File file = new File(Final_Path);
+            FileWriter fr = new FileWriter(file, true);
+            BufferedWriter br = new BufferedWriter(fr);
             while ((line = fileReader.readLine()) != null)
             {
                 tokens = line.split(Delimiter);
                 for(int index : indexes)
                 {
+                    String final_S =  tokens[index]+","+"1";
+                    br.write(final_S);
+                    br.newLine();
                     System.out.print(tokens[index] + " | ");
                 }
                 System.out.println();
             }
+            br.close();
+            fr.close();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -268,7 +279,8 @@ public class Visitor   extends gBaseVisitor<Object> {
 
         }
     }
-// test comment 
+
+// test comment
     public void separate_star(String path , String Delimiter)
     {
         BufferedReader fileReader = null;
