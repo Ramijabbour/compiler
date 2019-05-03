@@ -1,0 +1,6 @@
+create table where_stmt_test_table (id int , name string , number int)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
+LOCATION "E:\ÑÇÈÚÉ\Compiler2\intellij_out\where_stmt_test_table";
+
+
+select id from where_stmt_test_table where number > 13
