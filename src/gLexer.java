@@ -1,4 +1,4 @@
-// Generated from C:/Users/MJ/IdeaProjects/untitled3/src\g.g4 by ANTLR 4.7
+// Generated from C:/Users/Rami/Desktop/compiler/untitled3/compiler/src\g.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

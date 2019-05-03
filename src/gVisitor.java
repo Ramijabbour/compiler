@@ -1,4 +1,4 @@
-// Generated from C:/Users/MJ/IdeaProjects/untitled3/src\g.g4 by ANTLR 4.7
+// Generated from C:/Users/Rami/Desktop/compiler/untitled3/compiler/src\g.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -304,6 +304,12 @@ public interface gVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFor_loop(gParser.For_loopContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link gParser#end_for}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEnd_for(gParser.End_forContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link gParser#for_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -585,6 +591,12 @@ public interface gVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitIf_plsql_stmt(gParser.If_plsql_stmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link gParser#end_if}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEnd_if(gParser.End_ifContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link gParser#if_tsql_stmt}.
 	 * @param ctx the parse tree

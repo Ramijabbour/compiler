@@ -1,4 +1,4 @@
-// Generated from C:/Users/MJ/IdeaProjects/untitled3/src\g.g4 by ANTLR 4.7
+// Generated from C:/Users/Rami/Desktop/compiler/untitled3/compiler/src\g.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -497,6 +497,16 @@ public interface gListener extends ParseTreeListener {
 	 */
 	void exitFor_loop(gParser.For_loopContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link gParser#end_for}.
+	 * @param ctx the parse tree
+	 */
+	void enterEnd_for(gParser.End_forContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link gParser#end_for}.
+	 * @param ctx the parse tree
+	 */
+	void exitEnd_for(gParser.End_forContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link gParser#for_type}.
 	 * @param ctx the parse tree
 	 */
@@ -966,6 +976,16 @@ public interface gListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIf_plsql_stmt(gParser.If_plsql_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link gParser#end_if}.
+	 * @param ctx the parse tree
+	 */
+	void enterEnd_if(gParser.End_ifContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link gParser#end_if}.
+	 * @param ctx the parse tree
+	 */
+	void exitEnd_if(gParser.End_ifContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link gParser#if_tsql_stmt}.
 	 * @param ctx the parse tree

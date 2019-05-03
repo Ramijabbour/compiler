@@ -27,7 +27,7 @@ public class launch {
             s.visit(tree);
             s.printTable();
             //System.out.println("after visit :: ");
-           // Load_Data_Types();
+           //Load_Data_Types();
            // v.print_table();
             //Ast.draw_ast();
         } catch (IOException e) {

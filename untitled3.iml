@@ -10,7 +10,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Desktop/antlr-4.7-intellij-1.8.4-version-complete.jar!/" />
+          <root url="jar://D:/programe/antlr-4.7-intellij-1.8.4-version-complete.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
