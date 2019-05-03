@@ -1,1 +1,36 @@
-select id from where_stmt_test_table where number > id
+void x ()
+{
+int i;
+for(i=0;i<2;i++)
+{
+    int k ;
+
+if x>5 then {
+int y;
+} end if
+
+
+}
+
+}
+
+
+
+
+void y ()
+{
+int i;
+
+for(i=0;i<2;i++)
+{
+    int k ;
+}
+
+
+for(i=0;i<2;i++)
+{
+    int k ;
+}
+
+
+}
