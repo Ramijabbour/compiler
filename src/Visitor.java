@@ -77,6 +77,10 @@ public class Visitor   extends gBaseVisitor<Object> {
                                         System.out.println("syc error in where clause : column not found  ");
                                         return null ;
                                     }
+                                    if(line_1_index == -2 )
+                                    {
+                                        return null ;
+                                    }
                                     String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
                                     String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().int_number().getText();
                                     Folder_Path = handle_where_clause_unary(Folder_Path,line_1_index,line_2,operator,",");
@@ -147,9 +151,13 @@ public class Visitor   extends gBaseVisitor<Object> {
                         String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().ident().getText();;
                         int line_1_index = get_where_index(line_1,table_name);
                         int line_2_index = get_where_index(line_2,table_name);
-                        if(line_1_index == -1 || line_2_index == -1  )
+                        if(line_1_index == -1 || line_2_index == -1  ) // error code 1 column not found
                         {
                             System.out.println("syc error in where clause : column not found  ");
+                            return null ;
+                        }
+                        if(line_1_index == -2 || line_2_index == -2) // error code 2 type missmatch
+                        {
                             return null ;
                         }
                         Folder_Path = handle_where_clause_binary(Folder_Path,line_1_index,line_2_index,operator,",");
@@ -192,6 +200,7 @@ public class Visitor   extends gBaseVisitor<Object> {
 
     public int stringCompare(String str1, String str2)
     {
+        try{
         int str1_num = Integer.parseInt(str1);
         int str2_num = Integer.parseInt(str2);
         if(str1_num > str2_num)
@@ -200,6 +209,11 @@ public class Visitor   extends gBaseVisitor<Object> {
             return -1;
         else
             return 0;
+        }catch (Exception e )
+        {
+            System.out.println("error at class visitor : stringcompare - type missmatch error");
+            return -2 ;
+        }
         /*int l1 = str1.length();
         int l2 = str2.length();
         int lmin = Math.min(l1, l2);
@@ -570,7 +584,6 @@ public class Visitor   extends gBaseVisitor<Object> {
 
     public boolean exist(String path )
     {
-
         return (new File(path)).exists();
     }
 }
