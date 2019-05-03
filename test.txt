@@ -1,1 +1,1 @@
-select Region,Country,Item_Type,Sales_Channel from test_table1
+select id from where_stmt_test_table where name = name14

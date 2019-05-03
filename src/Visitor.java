@@ -65,6 +65,25 @@ public class Visitor   extends gBaseVisitor<Object> {
                     {
                         String Folder_Path =  get_dir(table_name);
                         if(Folder_Path != null) {
+                            try
+                            {
+                                ///// if the is where clause we process the file first then we select
+                                if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
+                                {
+                                    String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
+                                    int line_1_index = get_where_index(line_1,table_name);
+                                    if(line_1_index == -1 )
+                                    {
+                                        System.out.println("syc error in where clause : column not found  ");
+                                        return null ;
+                                    }
+                                    String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
+                                    String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().int_number().getText();
+                                    Folder_Path = handle_where_clause_unary(Folder_Path,line_1_index,line_2,operator,",");
+                                }
+                            }
+                            catch (Exception e )
+                            {}
                             File folder = new File(Folder_Path);
                             File[] listOfFiles = folder.listFiles();
                             String in_path = "";
@@ -74,9 +93,6 @@ public class Visitor   extends gBaseVisitor<Object> {
                                 if (listOfFile.isFile()) {
                                     System.out.println("File " + listOfFile.getName());
                                     in_path = listOfFile.getPath();
-                                    //write_file_buffer(Tokens,"E:\\رابعة\\Compiler2\\intellij_out\\test_table1\\out\\","star_out");
-                                    //print the output
-                                    int vars_num = get_vars_num(table_name);int counter = 1 ;
                                     Data_Type select_header  = table_name_exist(table_name);
                                     for(int i = 0 ; i < select_header.names.size() ; i ++ )
                                     {
@@ -85,14 +101,6 @@ public class Visitor   extends gBaseVisitor<Object> {
                                     }
                                     System.out.println();
                                     separate_star(in_path, ",");
-                                    /*for(int i = 0 ; i<Tokens.size() ; i ++ )
-                                    {
-                                        String temp = (String)Tokens.get(i);
-                                        System.out.print(temp+" | ");
-                                        if(counter % vars_num == 0 ){
-                                            System.out.println();}
-                                        counter++ ;
-                                    }*/
                                 }
                             }
                         }
@@ -110,11 +118,27 @@ public class Visitor   extends gBaseVisitor<Object> {
             if(table_from_data_type.compare_name(select_columns))
             {
                 String Folder_Path =  get_dir(table_name);
+                try
+                {
+                    ///// if the is where clause we process the file first then we select
+                    if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
+                    {
+                        String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
+                        int line_1_index = get_where_index(line_1,table_name);
+                        if(line_1_index == -1 )
+                        {
+                            System.out.println("syc error in where clause : column not found  ");
+                            return null ;
+                        }
+                        String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
+                        String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().int_number().getText();
+                        Folder_Path = handle_where_clause_unary(Folder_Path,line_1_index,line_2,operator,",");
+                    }
+                }
+                catch (Exception e )
+                {}
                 int[] indexes = get_indexes(select_columns,table_name);
-                int vars_count = get_vars_num(table_name);
                 String in_path = "";String out_path = "" ;
-                ArrayList tokens = new ArrayList() ;
-                Shuffle_output SO = new Shuffle_output();
                 if(Folder_Path != null)
                 {
                     File folder = new File(Folder_Path);
@@ -131,18 +155,8 @@ public class Visitor   extends gBaseVisitor<Object> {
                             out_path = out_dir+"\\"+listOfFile.getName()+"map_out";
                             System.out.println(out_path);
                             separate(in_path,",",indexes,out_path);
-                            //try {
-                              //  Map(indexes, tokens, vars_count, listOfFile.getName(), Folder_Path+"\\out");
-                                //print_Map(Folder_Path+"\\out",select_columns);
-                           // }catch(Exception E ){
-                             //   System.out.println("error in Visitor//MapFunction");
-                               // E.printStackTrace();
-                            //}
-                            //   String Final_Path = out_dir+"\\"+"Map_Out_"+listOfFile.getName()+".txt";
-                            //     SO.shuffle_folder(Final_Path,Folder_Path,listOfFile.getName());
                         }
                     }
-                    // SO.Reduce("sum", Folder_Path+"\\shuffle_out");
                 }else
                 {
                     System.out.println("data Type path not Found !! ");
@@ -156,6 +170,122 @@ public class Visitor   extends gBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
+    public int stringCompare(String str1, String str2)
+    {
+
+        int l1 = str1.length();
+        int l2 = str2.length();
+        int lmin = Math.min(l1, l2);
+
+        for (int i = 0; i < lmin; i++) {
+            int str1_ch = (int)str1.charAt(i);
+            int str2_ch = (int)str2.charAt(i);
+
+            if (str1_ch != str2_ch) {
+                return str1_ch - str2_ch;
+            }
+        }
+
+        if (l1 != l2) {
+            return l1 - l2;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    public String handle_where_clause_unary(String path , int index , String comp_string , String operator , String Delimiter)
+    {
+        String out_String = "" ;
+        if(path != null)
+        {
+            String out_path = "";
+            String in_path = "" ;
+            File folder = new File(path);
+            File[] listOfFiles = folder.listFiles();
+            File out_dir = new File(path+"\\temp");
+            out_String = path+"\\temp" ;
+            out_dir.mkdirs();
+            for (File listOfFile : listOfFiles)
+            {
+                if (listOfFile.isFile())
+                {
+                    in_path = listOfFile.getPath();
+                    out_path = out_dir+"\\"+listOfFile.getName()+"_where_handle_temp.txt";
+                    BufferedReader fileReader = null;
+                    String[] tokens = null ;
+                    String line ;
+                    try
+                    {
+                        fileReader = new BufferedReader(new FileReader(in_path));
+                        File file = new File(out_path);
+                        FileWriter fr = new FileWriter(file, true);
+                        BufferedWriter br = new BufferedWriter(fr);
+                        while ((line = fileReader.readLine()) != null)
+                        {
+                            tokens = line.split(Delimiter);
+                            switch (operator)
+                            {
+                                case ">" :
+                                    if(stringCompare(tokens[index] , comp_string) > 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case "<" :
+                                    if(stringCompare(tokens[index] , comp_string) < 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case ">=" :
+                                    if(stringCompare(tokens[index] , comp_string) >= 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case "<=" :
+                                    if(stringCompare(tokens[index] , comp_string) <= 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case "=" :
+                                    if(stringCompare(tokens[index] , comp_string) == 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                            }
+                        }
+                        br.close();
+                        fr.close();
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    finally {
+                        try {
+                            fileReader.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        }else
+        {
+            System.out.println("data Type path not Found !! ");
+            return null ;
+        }
+        return out_String ;
+    }
 
     public  Data_Type table_name_exist(String s )
     {
@@ -169,8 +299,6 @@ public class Visitor   extends gBaseVisitor<Object> {
         }
         return null ;
     }
-
-    ///map reduce code starts here
 
     public  String get_dir(String DTName)
     {
@@ -190,6 +318,30 @@ public class Visitor   extends gBaseVisitor<Object> {
         return null  ;
     }
 
+
+    public int get_where_index(String Name , String DTName)
+    {
+        int index  ;
+        Data_Type dt = new Data_Type() ;
+        for (Object Data_Type : launch.Data_Types) {
+            dt = (Data_Type) Data_Type;
+            if(dt.name.equalsIgnoreCase(DTName))
+            {
+                ArrayList as = dt.names ;
+                  String name =  Name;
+                  for(int j = 0 ; j < as.size() ; j ++ )
+                    {
+                        if(as.get(j).equals(name))
+                        {
+                            index = j ;
+                            return index ;
+                        }
+                    }
+                break ;
+            }
+        }
+        return -1 ;
+    }
     public int[] get_indexes(ArrayList Names , String DTName)
     {
         int[] indexes = new int[Names.size()];
@@ -225,19 +377,6 @@ public class Visitor   extends gBaseVisitor<Object> {
         {
             return indexes ;
         }
-    }
-
-    public int get_vars_num(String DTName)
-    {
-        for(int i = 0 ; i < launch.Data_Types.size() ; i++)
-        {
-            Data_Type dt = (Data_Type)launch.Data_Types.get(i);
-            if(dt.name.equalsIgnoreCase(DTName))
-            {
-                return dt.vars.size() ;
-            }
-        }
-        return -1 ;
     }
 
     public void separate(String in_path , String Delimiter , int[] indexes , String out_path)
@@ -280,7 +419,6 @@ public class Visitor   extends gBaseVisitor<Object> {
         }
     }
 
-// test comment
     public void separate_star(String path , String Delimiter)
     {
         BufferedReader fileReader = null;
@@ -310,86 +448,9 @@ public class Visitor   extends gBaseVisitor<Object> {
         }
     }
 
-
     public boolean exist(String path )
     {
 
         return (new File(path)).exists();
     }
-
-    public void write_file_buffer(ArrayList Tokens ,String path  , String ext) throws IOException
-    {
-        String Final_Path = path+"\\"+ext+".txt";
-        File file = new File(Final_Path);
-        FileWriter fr = new FileWriter(file, true);
-        BufferedWriter br = new BufferedWriter(fr);
-        for(Object s : Tokens )
-        {
-            br.write((String)s);
-        }
-        br.newLine();
-        br.close();
-        fr.close();
-    }
-
-    public void Map(int[] index ,ArrayList tokens,int num ,String filename , String folder_path ) throws IOException
-    {
-        for(int i = 0 ; i <tokens.size()/ num; i+=num)
-        {
-            ArrayList Tokens_Temp = new ArrayList() ;
-            for(int j = 0 ; j < index.length ; j ++)
-            {
-                //if(i == index[j] || i%num == index[j])
-                //{
-               // System.out.println(tokens.get(i+index[j]));
-                    Tokens_Temp.add(tokens.get(i+index[j]));
-                //}
-            }
-            if(!Tokens_Temp.isEmpty())
-                write_file_buffer(Tokens_Temp,folder_path,"Map_Out_"+filename);
-        }
-        System.out.println("");
-    }
-
-    public void print_Map(String folder_path ,ArrayList select_list )//to print the map output
-    {
-        File folder = new File(folder_path);
-        File[] listOfFiles = folder.listFiles();
-        File out_dir = new File(folder_path);//add unique name for each select stmt
-        out_dir.mkdirs();
-        for (File listOfFile : listOfFiles) {
-            if (listOfFile.isFile()) {
-                BufferedReader fileReader = null;
-                try {
-                    System.out.println();
-                    String line = "";
-                    int counter = 0;
-                    fileReader = new BufferedReader(new FileReader(listOfFile.getPath()));
-                    for (int i = 0; i < select_list.size(); i++) {
-                        String temp = (String) select_list.get(i);
-                        System.out.print(temp + " ");
-                    }
-                    System.out.println();
-                    while ((line = fileReader.readLine()) != null)
-                    {
-                        System.out.print(line + " ");
-                        counter++;
-                        if (counter % select_list.size() == 0) {
-                            System.out.println();
-                        }
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        fileReader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-    /// mapreduce code end
 }
