@@ -22,10 +22,12 @@ public class launch {
             ParseTree tree = parser.program();
             Visitor visit = new Visitor();
             visit.visit(tree);
-            //Symbol_Table v= new Symbol_Table();
-            //v.visit(tree);
+
+            SymbolTable s= new SymbolTable();
+            s.visit(tree);
+            s.printTable();
             //System.out.println("after visit :: ");
-            //Load_Data_Types();
+           // Load_Data_Types();
            // v.print_table();
             //Ast.draw_ast();
         } catch (IOException e) {
@@ -38,7 +40,7 @@ public class launch {
     {
         try{
             Data_Types.add(DT);
-            FileOutputStream fos = new FileOutputStream("C:\\Users\\MJ\\IdeaProjects\\untitled3\\src\\data_types.ser");
+            FileOutputStream fos = new FileOutputStream("src\\data_types.ser");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(Data_Types);
             oos.close();
@@ -55,7 +57,7 @@ public class launch {
     public static void Load_Data_Types()
     {
         try{
-            FileInputStream fin =  new FileInputStream("C:\\Users\\MJ\\IdeaProjects\\untitled3\\src\\data_types.ser");
+            FileInputStream fin =  new FileInputStream("src\\data_types.ser");
             ObjectInputStream ois = new ObjectInputStream(fin);
             ArrayList Temp = (ArrayList)ois.readObject();
             for(int i = 0 ; i < Temp.size() ; i ++ )
