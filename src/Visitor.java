@@ -137,6 +137,26 @@ public class Visitor   extends gBaseVisitor<Object> {
                 }
                 catch (Exception e )
                 {}
+                try
+                {
+                    ///// if the is where clause we process the file first then we select
+                    if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
+                    {
+                        String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
+                        String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
+                        String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().ident().getText();;
+                        int line_1_index = get_where_index(line_1,table_name);
+                        int line_2_index = get_where_index(line_2,table_name);
+                        if(line_1_index == -1 || line_2_index == -1  )
+                        {
+                            System.out.println("syc error in where clause : column not found  ");
+                            return null ;
+                        }
+                        Folder_Path = handle_where_clause_binary(Folder_Path,line_1_index,line_2_index,operator,",");
+                    }
+                }
+                catch (Exception e )
+                {}
                 int[] indexes = get_indexes(select_columns,table_name);
                 String in_path = "";String out_path = "" ;
                 if(Folder_Path != null)
@@ -172,8 +192,15 @@ public class Visitor   extends gBaseVisitor<Object> {
 
     public int stringCompare(String str1, String str2)
     {
-
-        int l1 = str1.length();
+        int str1_num = Integer.parseInt(str1);
+        int str2_num = Integer.parseInt(str2);
+        if(str1_num > str2_num)
+            return 1 ;
+        else if (str1_num < str2_num)
+            return -1;
+        else
+            return 0;
+        /*int l1 = str1.length();
         int l2 = str2.length();
         int lmin = Math.min(l1, l2);
 
@@ -191,7 +218,100 @@ public class Visitor   extends gBaseVisitor<Object> {
         }
         else {
             return 0;
+        }*/
+    }
+
+    public String handle_where_clause_binary(String path , int index1 , int index2 , String operator , String Delimiter)
+    {
+        String out_String = "" ;
+        if(path != null)
+        {
+            String out_path = "";
+            String in_path = "" ;
+            File folder = new File(path);
+            File[] listOfFiles = folder.listFiles();
+            File out_dir = new File(path+"\\temp");
+            out_String = path+"\\temp" ;
+            out_dir.mkdirs();
+            for (File listOfFile : listOfFiles)
+            {
+                if (listOfFile.isFile())
+                {
+                    in_path = listOfFile.getPath();
+                    out_path = out_dir+"\\"+listOfFile.getName()+"_where_handle_temp.txt";
+                    BufferedReader fileReader = null;
+                    String[] tokens = null ;
+                    String line ;
+                    try
+                    {
+                        fileReader = new BufferedReader(new FileReader(in_path));
+                        File file = new File(out_path);
+                        FileWriter fr = new FileWriter(file, true);
+                        BufferedWriter br = new BufferedWriter(fr);
+                        while ((line = fileReader.readLine()) != null)
+                        {
+                            tokens = line.split(Delimiter);
+                            switch (operator)
+                            {
+                                case ">" :
+                                    if(stringCompare(tokens[index1] , tokens[index2]) > 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case "<" :
+                                    if(stringCompare(tokens[index1] , tokens[index2]) < 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case ">=" :
+                                    if(stringCompare(tokens[index1] , tokens[index2]) >= 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case "<=" :
+                                    if(stringCompare(tokens[index1] , tokens[index2]) <= 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                                case "=" :
+                                    if(stringCompare(tokens[index1] , tokens[index2]) == 0 )
+                                    {
+                                        br.write(line);
+                                        br.newLine();
+                                    }
+                                    break ;
+                            }
+                        }
+                        br.close();
+                        fr.close();
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    finally {
+                        try {
+                            fileReader.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        }else
+        {
+            System.out.println("data Type path not Found !! ");
+            return null ;
         }
+        return out_String ;
     }
 
     public String handle_where_clause_unary(String path , int index , String comp_string , String operator , String Delimiter)
@@ -318,7 +438,6 @@ public class Visitor   extends gBaseVisitor<Object> {
         return null  ;
     }
 
-
     public int get_where_index(String Name , String DTName)
     {
         int index  ;
@@ -342,6 +461,7 @@ public class Visitor   extends gBaseVisitor<Object> {
         }
         return -1 ;
     }
+
     public int[] get_indexes(ArrayList Names , String DTName)
     {
         int[] indexes = new int[Names.size()];

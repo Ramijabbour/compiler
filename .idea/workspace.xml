@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66341e94-7959-4260-bc31-4fc136dda5d0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/untitled3/Visitor.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/untitled3/Visitor.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Visitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Visitor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test.txt" afterDir="false" />
     </list>
@@ -95,14 +93,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="1926" />
-          <entry key="txt" value="56" />
+          <entry key="java" value="2164" />
+          <entry key="txt" value="70" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="1926" />
-          <entry key="PLAIN_TEXT" value="56" />
+          <entry key="JAVA" value="2164" />
+          <entry key="PLAIN_TEXT" value="70" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -125,7 +123,7 @@
         <entry file="file://$PROJECT_DIR$/test.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="54" selection-start-column="54" selection-end-column="54" />
+              <caret column="47" selection-start-column="47" selection-end-column="47" />
             </state>
           </provider>
         </entry>
@@ -155,12 +153,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Visitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="138" column="18" selection-start-line="138" selection-start-column="18" selection-end-line="138" selection-end-column="18" />
+            <state relative-caret-position="142">
+              <caret line="195" column="39" selection-start-line="195" selection-start-column="39" selection-end-line="195" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#visitCreate_table_stmt#0;class#Visitor#0" />
-                <element signature="method#stringCompare#0;class#Visitor#0" />
                 <element signature="method#handle_where_clause_unary#0;class#Visitor#0" />
                 <element signature="method#table_name_exist#0;class#Visitor#0" />
                 <element signature="method#get_dir#0;class#Visitor#0" />
@@ -314,8 +311,8 @@
         <option value="$PROJECT_DIR$/src/Shuffle_output.java" />
         <option value="$PROJECT_DIR$/src/g.g4" />
         <option value="$PROJECT_DIR$/src/launch.java" />
-        <option value="$PROJECT_DIR$/src/Visitor.java" />
         <option value="$PROJECT_DIR$/test.txt" />
+        <option value="$PROJECT_DIR$/src/Visitor.java" />
       </list>
     </option>
   </component>
@@ -370,7 +367,7 @@
     <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
     <property name="GenerateAntBuildDialog.outputFileNameProperty" value="untitled3" />
     <property name="SearchEverywhereHistoryKey" value="java thread&#9;PSI&#9;JAVA://sun.jvm.hotspot.ui.JavaThreadsPanel.JavaThreadsTableModel#getJavaThread" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1556895868742" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1556899747714" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -435,7 +432,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" x="567" y="159" width="231" height="409" id="Project" order="0" sideWeight="0.49739584" visible="true" weight="0.1301059" />
       <window_info id="Structure" order="1" sideWeight="0.5026042" side_tool="true" weight="0.18078668" />
@@ -768,18 +764,17 @@
     <entry file="file://$PROJECT_DIR$/test.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="54" selection-start-column="54" selection-end-column="54" />
+          <caret column="47" selection-start-column="47" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Visitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="138" column="18" selection-start-line="138" selection-start-column="18" selection-end-line="138" selection-end-column="18" />
+        <state relative-caret-position="142">
+          <caret line="195" column="39" selection-start-line="195" selection-start-column="39" selection-end-line="195" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#visitCreate_table_stmt#0;class#Visitor#0" />
-            <element signature="method#stringCompare#0;class#Visitor#0" />
             <element signature="method#handle_where_clause_unary#0;class#Visitor#0" />
             <element signature="method#table_name_exist#0;class#Visitor#0" />
             <element signature="method#get_dir#0;class#Visitor#0" />
