@@ -297,8 +297,10 @@ functions:
 
 for_loop:
     T_FOR T_OPEN_P int_number ':' int_number T_CLOSE_P T_LOOP functions* T_END
-    |T_FOR T_OPEN_P for_type column_name T_EQUAL int_number T_SEMICOLON column_name (T_GREATER | T_GREATEREQUAL | T_LESS | T_LESSEQUAL ) int_number T_SEMICOLON column_name (T_ADD T_ADD | T_SUB T_SUB ) T_CLOSE_P  T_OPEN_B functions* T_CLOSE_B
+    |T_FOR T_OPEN_P for_type column_name T_EQUAL int_number T_SEMICOLON column_name (T_GREATER | T_GREATEREQUAL | T_LESS | T_LESSEQUAL ) int_number T_SEMICOLON column_name (T_ADD T_ADD | T_SUB T_SUB ) T_CLOSE_P  T_OPEN_B functions* T_CLOSE_B end_for
     ;
+end_for :
+;
 for_type :
      T_INT
      |T_CHAR
@@ -575,9 +577,10 @@ if_stmt :               // IF statement
      ;
 
 if_plsql_stmt :
-       T_IF bool_expr T_THEN T_OPEN_B  block T_CLOSE_B  elseif_block* else_block? T_END T_IF
+       T_IF bool_expr T_THEN T_OPEN_B  block T_CLOSE_B end_if elseif_block* else_block? T_END T_IF
      ;
-
+end_if:
+;
 if_tsql_stmt :
        T_IF bool_expr single_block_stmt (T_ELSE single_block_stmt)?
      ;

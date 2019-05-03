@@ -1,9 +1,11 @@
+import com.sun.org.apache.regexp.internal.RE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class SymbolTable{
+public class SymbolTable extends gBaseVisitor<Object>{
 
 	private Scope root ; // the root scope
 	private Scope current; // current scope
@@ -14,7 +16,84 @@ public class SymbolTable{
 		this.root = new Scope(null);
 		this.current = root;
 	}
-	
+
+
+	@Override public Object visitVarss(gParser.VarssContext ctx)
+	{
+		Record r =new Record(ctx.column_name().getText(),ctx.dtypee().getText()) ;
+		put(ctx.column_name().getText(),r);
+		//System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+		//root.printScope();
+
+
+		return visitChildren(ctx);
+	}
+
+	@Override public Object visitFunction_stmnt(gParser.Function_stmntContext ctx)
+	{
+
+		setCurrentScopeNameAndType(ctx.function_name().getText(),ctx.return_type().getText());
+		MethodRecord m = new MethodRecord(ctx.function_name().getText(),ctx.return_type().getText());
+		setCurrentScopeFunction(m);
+
+		//System.out.println("hiiiiiiiiiiiiiiiiiiiiii");
+		return visitChildren(ctx);
+	}
+
+
+	@Override public Object visitFunction_end(gParser.Function_endContext ctx) {
+		System.out.println("parent"+"     "+current.parent.scopeName);
+		System.out.println("son"+"           "+current.scopeName);
+		System.out.println(current.children.size());
+		exitScope();
+		System.out.println(current.scopeName);
+			return visitChildren(ctx);
+	}
+
+	@Override public Object visitPars(gParser.ParsContext ctx)
+	{
+		Record r= new Record(ctx.column_name().getText(),ctx.dtypee().getText());
+		current.containingMethod.addParameter(r);
+
+		//System.out.println("fuckkkkkkkkkk");
+		return visitChildren(ctx);
+	}
+
+	@Override public Object visitFor_loop(gParser.For_loopContext ctx)
+	{
+		setCurrentScopeNameAndType("for",current.scopeName);
+
+		return visitChildren(ctx);
+	}
+	@Override public Object visitEnd_for(gParser.End_forContext ctx)
+	{
+		exitScope();
+		return visitChildren(ctx);
+	}
+
+
+	@Override public Object visitIf_stmt(gParser.If_stmtContext ctx)
+	{
+		setCurrentScopeNameAndType("if",current.scopeName);
+
+		return visitChildren(ctx);
+	}
+
+	@Override public Object visitEnd_if(gParser.End_ifContext ctx)
+	{
+		exitScope();
+		return visitChildren(ctx);
+	}
+
+
+	@Override public Object visitStmt(gParser.StmtContext ctx)
+
+	{
+
+		return visitChildren(ctx);
+	}
+
+
 	public String getCurrentClassName(){
 		return this.current.getContainingClass().getId();
 	}
@@ -28,6 +107,7 @@ public class SymbolTable{
 	}
 	
 	public void setCurrentScopeNameAndType(String scopeName, String scopeType){
+		enterScope();
 		this.current.setScopeNameAndType(scopeName, scopeType);
 	}
 
@@ -38,7 +118,12 @@ public class SymbolTable{
 
 	public void setCurrentScopeClass(ClassRecord containingClass) {
 		this.current.setContainingClass(containingClass);
-	}	
+	}
+
+	public void setCurrentScopeFunction(MethodRecord containingMethod) {
+		this.current.setContainingMethod(containingMethod);
+	}
+
 
 	public void exitScope() {
 		current = current.getParent();
@@ -93,6 +178,9 @@ public class SymbolTable{
 		// symbol to record map
 		private Map<String, Record> records = new HashMap<String, Record>();
 		ClassRecord containingClass = new ClassRecord("prog", "program");
+
+		MethodRecord containingMethod = new MethodRecord("root", "root");
+
 		// for visual identification
 		String scopeName = "";  
 		String scopeType = "";
@@ -100,7 +188,9 @@ public class SymbolTable{
 		public Scope(Scope parent) {
 			this.parent = parent;
 		}
-		
+
+
+
 		public void setScopeNameAndType(String scopeName, String scopeType) {
 			this.scopeName = scopeName;
 			this.scopeType = scopeType;
@@ -120,6 +210,10 @@ public class SymbolTable{
 
 		public void setContainingClass(ClassRecord containingClass) {
 			this.containingClass = containingClass;
+		}
+
+		public void setContainingMethod(MethodRecord containingMethod) {
+			this.containingMethod = containingMethod;
 		}
 
 		public Record getMethod(String methodName){
