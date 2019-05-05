@@ -20,14 +20,68 @@ public class SymbolTable extends gBaseVisitor<Object>{
 
 	@Override public Object visitVarss(gParser.VarssContext ctx)
 	{
+		boolean putInTable=true,existInParameters=false;
+
 		Record r =new Record(ctx.column_name().getText(),ctx.dtypee().getText()) ;
-		put(ctx.column_name().getText(),r);
-		//System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-		//root.printScope();
+
+		//vars and parameters  and tow parameters and parameters used in scope
+		for (int i = 0; i < current.containingMethod.paramNumber; i++)
+			if (current.containingMethod.containParameter(i, r)) {
+				try {
+					if (ctx.dtypee().error().getText() != null)
+					{
+						putInTable = false;
+						existInParameters=true;
+					}
+				}
+				catch (Exception e){
+					System.err.println("error the parameters vars "+ ctx.column_name().getText()+"  is already declared");
+					System.exit(-1);
+				}
 
 
-		return visitChildren(ctx);
-	}
+			}
+			// tow vars in same scope
+			if (current.exist(ctx.column_name().getText()) ) {
+				try {
+
+					if (ctx.dtypee().error().getText() != null)
+					{
+						putInTable = false;
+					}
+				}
+				catch (Exception e){
+					System.err.println("error the variable "+ ctx.column_name().getText()+ " is already declared");
+					System.exit(-1);
+				}
+
+			}
+					//not exist any where
+				else if (!current.exist(ctx.column_name().getText()) && !existInParameters)
+					{
+						try {
+
+				if (ctx.dtypee().error().getText() != null )
+				{
+					System.err.println("error the variable  "+ ctx.column_name().getText()+"  undeclared");
+					System.exit(-1);
+				}
+			}
+			catch (Exception e){
+				putInTable=true;
+			}
+
+		}
+
+		if(putInTable)
+			put(ctx.column_name().getText(), r);
+			//System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+			//root.printScope();
+
+
+			return visitChildren(ctx);
+			}
+
 
 	@Override public Object visitFunction_stmnt(gParser.Function_stmntContext ctx)
 	{
@@ -35,34 +89,45 @@ public class SymbolTable extends gBaseVisitor<Object>{
 		setCurrentScopeNameAndType(ctx.function_name().getText(),ctx.return_type().getText());
 		MethodRecord m = new MethodRecord(ctx.function_name().getText(),ctx.return_type().getText());
 		setCurrentScopeFunction(m);
+		//current.containingMethod.exist("i");
 
-		//System.out.println("hiiiiiiiiiiiiiiiiiiiiii");
 		return visitChildren(ctx);
 	}
 
 
 	@Override public Object visitFunction_end(gParser.Function_endContext ctx) {
-		System.out.println("parent"+"     "+current.parent.scopeName);
-		System.out.println("son"+"           "+current.scopeName);
-		System.out.println(current.children.size());
 		exitScope();
-		System.out.println(current.scopeName);
 			return visitChildren(ctx);
 	}
 
 	@Override public Object visitPars(gParser.ParsContext ctx)
 	{
-		Record r= new Record(ctx.column_name().getText(),ctx.dtypee().getText());
-		current.containingMethod.addParameter(r);
 
-		//System.out.println("fuckkkkkkkkkk");
+		Record r= new Record(ctx.column_name().getText(),ctx.dtypee().getText());
+		for (int i = 0 ; i<current.containingMethod.paramNumber;i++)
+		if(current.containingMethod.containParameter(i,r)) {
+
+		System.err.println("error the parameters is already declared");
+		System.exit(-1);
+	}
+		current.containingMethod.addParameter(r);
+		System.out.println(current.containingMethod.numberOfParameters());
+		current.containingMethod.printParameters();
+
+
 		return visitChildren(ctx);
 	}
 
 	@Override public Object visitFor_loop(gParser.For_loopContext ctx)
 	{
 		setCurrentScopeNameAndType("for",current.scopeName);
-
+		Record r =new Record(ctx.column_name(0).getText(),ctx.for_type().getText());
+		if(current.exist(ctx.column_name(0).getText()))
+		{
+			System.err.println("the variable    "  + ctx.column_name(0).getText()+ "    (for) is already declared");
+			System.exit(-1);
+	    }
+		put(ctx.column_name(0).getText(),r);
 		return visitChildren(ctx);
 	}
 	@Override public Object visitEnd_for(gParser.End_forContext ctx)
@@ -76,6 +141,12 @@ public class SymbolTable extends gBaseVisitor<Object>{
 	{
 		setCurrentScopeNameAndType("if",current.scopeName);
 
+
+		if(!current.exist(ctx.if_tsql_stmt().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText()))
+		{
+			System.err.println("The variable in (if ) not declared ");
+			System.exit(-1);
+		}
 		return visitChildren(ctx);
 	}
 
@@ -85,6 +156,25 @@ public class SymbolTable extends gBaseVisitor<Object>{
 		return visitChildren(ctx);
 	}
 
+	@Override public Object visitAssignment_stmt(gParser.Assignment_stmtContext ctx)
+	{
+		if(!current.exist(ctx.assignment_stmt_item(0).assignment_stmt_single_item().ident().getText()))
+		{
+			System.err.println("the variable "+ ctx.assignment_stmt_item(0).assignment_stmt_single_item().ident().getText()+" undeclared already  ");
+			System.exit(-1);
+
+		}
+		//for(int i = 0 ; i < ctx.assignment_stmt_item(0).assignment_stmt_single_item().expr().)
+		if(!current.exist(ctx.assignment_stmt_item(0).assignment_stmt_single_item().expr().expr(0).expr_atom().ident().getText()))
+		{
+			System.err.println("the variable "+ ctx.assignment_stmt_item(0).assignment_stmt_single_item().expr().expr(0).expr_atom().ident().getText()+" undeclared already  ");
+			System.exit(-1);
+
+		}
+
+
+		return visitChildren(ctx);
+	}
 
 	@Override public Object visitStmt(gParser.StmtContext ctx)
 
@@ -277,14 +367,21 @@ public class SymbolTable extends gBaseVisitor<Object>{
 		}
 
 		public Record lookup(String key) {
+			System.out.println("***************************************************"+records.size());
 			if(key.equals("this")){ // 'this' case
+
+				System.out.println("1*****************");
 				return containingClass;
 			}
-			if (records.containsKey(key)) { // is the key in current scope?
+			if (records.containsKey(key)) {
+
+				// is the key in current scope?
+				System.out.println(" 2*********************");
 				Record rec = (Record) records.get(key);
 				if(debug)System.out.println("\tRecord found on: "+scopeName+" [ "+scopeType+" ]");
 				return rec;
 			} else {
+				System.out.println("3       ++++++++++++++++++++++++++");
 				// move the scope to parent scope
 				if (parent == null) {
 					return null; // identifier is not contained
@@ -293,6 +390,29 @@ public class SymbolTable extends gBaseVisitor<Object>{
 				}
 			}
 		}
+
+
+public boolean exist(String key)
+{
+			if (records.containsKey(key)) {
+
+				// is the key in current scope?
+				Record rec = (Record) records.get(key);
+				debug=true;
+				if(debug)System.out.println("\tRecord found on: "+scopeName+" [ "+scopeType+" ]");
+				return true;
+			} else {
+				// move the scope to parent scope
+				if (parent == null) {
+					return false; // identifier is not contained
+				} else {
+					 return  parent.exist(key);
+
+					 // send the req to parent
+				}
+			}
+		}
+
 
 		public void resetScope() {
 			next = 0; // first child to visit next

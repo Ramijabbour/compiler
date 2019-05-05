@@ -1,1 +1,8 @@
-select id from where_stmt_test_table where number > 60;
+void x ()
+{
+int y=4;
+int z;
+int v;
+z=v+s
+
+}

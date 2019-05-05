@@ -272,8 +272,7 @@ pars:
     | dtypee column_name T_COMMA pars
     ;
 varss :
-    dtypee column_name T_SEMICOLON
-
+    dtypee column_name T_EQUAL? expr? T_SEMICOLON
         ;
 
 dtypee :

@@ -8,7 +8,7 @@ public class MethodRecord extends Record {
 
 	//private ArrayList<Record> parameters = new ArrayList<>();
 	private HashMap<Integer, Record> parameters = new HashMap<>();
-	int paramNumber = 0;
+	public  int paramNumber = 0;
 	
 	public MethodRecord(String id, String type) {
 		super(id, type);
@@ -26,7 +26,7 @@ public class MethodRecord extends Record {
 		Record paramRec = parameters.get(paramNumber);
 		if(parameter == null || paramRec == null)
 			return false;
-		return paramRec.getType().equals(parameter.getType());
+		return paramRec.getId().equals(parameter.getId());
 	}
 
 	public int numberOfParameters() {
@@ -34,7 +34,8 @@ public class MethodRecord extends Record {
 	}
 
 	public void printParameters() {
-		System.out.print("( ");
+		System.out.println("             function  parameters           ");
+		System.out.print("(");
 		Iterator it = parameters.entrySet().iterator();
 	    while (it.hasNext()) {
 	        Map.Entry pair = (Map.Entry)it.next();
@@ -48,4 +49,5 @@ public class MethodRecord extends Record {
 		*/
 		System.out.print(" )\n");
 	}
+
 }

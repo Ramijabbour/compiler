@@ -26,7 +26,8 @@ public class launch {
             SymbolTable s= new SymbolTable();
             s.visit(tree);
             s.printTable();
-            //System.out.println("after visit :: ");
+
+                //System.out.println("after visit :: ");
            //Load_Data_Types();
            // v.print_table();
             //Ast.draw_ast();

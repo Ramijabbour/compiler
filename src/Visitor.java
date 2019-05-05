@@ -64,37 +64,18 @@ public class Visitor   extends gBaseVisitor<Object> {
                     if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().select_list().select_list_item(0).select_list_asterisk().getText().equalsIgnoreCase("*"))
                     {
                         String Folder_Path =  get_dir(table_name);
-                        if(Folder_Path != null) {
-                            try
-                            {
-                                ///// if the is where clause we process the file first then we select
-                                if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
-                                {
-                                    String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
-                                    int line_1_index = get_where_index(line_1,table_name);
-                                    if(line_1_index == -1 )
-                                    {
-                                        System.out.println("syc error in where clause : column not found  ");
-                                        return null ;
-                                    }
-                                    if(line_1_index == -2 )
-                                    {
-                                        return null ;
-                                    }
-                                    String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
-                                    String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().int_number().getText();
-                                    Folder_Path = handle_where_clause_unary(Folder_Path,line_1_index,line_2,operator,",");
-                                }
-                            }
-                            catch (Exception e )
-                            {}
+                        if(Folder_Path != null)
+                        {
+                            Folder_Path = Handle_Where_Clause(ctx,Folder_Path,table_name);
                             File folder = new File(Folder_Path);
                             File[] listOfFiles = folder.listFiles();
                             String in_path = "";
                             File out_dir = new File(Folder_Path + "\\out");//add unique name for each select stmt
                             out_dir.mkdirs();
-                            for (File listOfFile : listOfFiles) {
-                                if (listOfFile.isFile()) {
+                            for (File listOfFile : listOfFiles)
+                            {
+                                if (listOfFile.isFile())
+                                {
                                     System.out.println("File " + listOfFile.getName());
                                     in_path = listOfFile.getPath();
                                     Data_Type select_header  = table_name_exist(table_name);
@@ -122,49 +103,7 @@ public class Visitor   extends gBaseVisitor<Object> {
             if(table_from_data_type.compare_name(select_columns))
             {
                 String Folder_Path =  get_dir(table_name);
-                try
-                {
-                    ///// if the is where clause we process the file first then we select
-                    if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
-                    {
-                        String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
-                        int line_1_index = get_where_index(line_1,table_name);
-                        if(line_1_index == -1 )
-                        {
-                            System.out.println("syc error in where clause : column not found  ");
-                            return null ;
-                        }
-                        String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
-                        String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().int_number().getText();
-                        Folder_Path = handle_where_clause_unary(Folder_Path,line_1_index,line_2,operator,",");
-                    }
-                }
-                catch (Exception e )
-                {}
-                try
-                {
-                    ///// if the is where clause we process the file first then we select
-                    if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
-                    {
-                        String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
-                        String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
-                        String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().ident().getText();;
-                        int line_1_index = get_where_index(line_1,table_name);
-                        int line_2_index = get_where_index(line_2,table_name);
-                        if(line_1_index == -1 || line_2_index == -1  ) // error code 1 column not found
-                        {
-                            System.out.println("syc error in where clause : column not found  ");
-                            return null ;
-                        }
-                        if(line_1_index == -2 || line_2_index == -2) // error code 2 type missmatch
-                        {
-                            return null ;
-                        }
-                        Folder_Path = handle_where_clause_binary(Folder_Path,line_1_index,line_2_index,operator,",");
-                    }
-                }
-                catch (Exception e )
-                {}
+                Folder_Path = Handle_Where_Clause(ctx,Folder_Path,table_name);
                 int[] indexes = get_indexes(select_columns,table_name);
                 String in_path = "";String out_path = "" ;
                 if(Folder_Path != null)
@@ -198,6 +137,196 @@ public class Visitor   extends gBaseVisitor<Object> {
         return visitChildren(ctx);
     }
 
+    public String Handle_Where_Clause(gParser.Select_stmtContext ctx , String Folder_Path , String table_name)
+    {
+        String Final_Path ;
+        try
+        {
+            ///// if the is where clause we process the file first then we select
+            if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
+            {
+                String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
+                int line_1_index = get_where_index(line_1,table_name);
+                if(line_1_index == -1 )
+                {
+                    System.out.println("syc error in where clause : column not found  ");
+                    return null ;
+                }
+                String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
+                String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().int_number().getText();
+                Final_Path = handle_where_clause_unary(Folder_Path,line_1_index,line_2,operator,",");
+                return Final_Path ;
+            }
+        }
+        catch (Exception e )
+        {}
+        try
+        {
+            ///// if the is where clause we process the file first then we select
+            if(ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().getText() != null)
+            {
+                String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
+                String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
+                String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().ident().getText();
+                int line_1_index = get_where_index(line_1,table_name);
+                int line_2_index = get_where_index(line_2,table_name);
+                String line_1_type=get_column_type(line_1,table_name);
+                String line_2_type=get_column_type(line_2,table_name);
+                if(line_1_index == -1 || line_2_index == -1  ) // error code 1 column not found
+                {
+                    System.out.println("syc error in where clause : column not found  ");
+                    return null ;
+                }
+                if(line_1_index == -2 || line_2_index == -2) // error code 2 type missmatch
+                {
+                    return null ;
+                }
+                if(!line_1_type.equalsIgnoreCase(line_2_type))
+                {
+                    System.out.println("error at class visitor : Type miss match ");
+                    return null ;
+                }
+                Final_Path = handle_where_clause_binary(Folder_Path,line_1_index,line_2_index,operator,",");
+                return Final_Path;
+            }
+        }
+        catch (Exception e )
+        {}
+        try // handle like statement
+        {
+            String line_1 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(0).expr_atom().ident().getText();
+            String operator = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().bool_expr_binary_operator().getText();
+            String line_2 = ctx.fullselect_stmt().fullselect_stmt_item(0).subselect_stmt().where_clause().bool_expr().bool_expr_atom().bool_expr_binary().expr(1).expr_atom().string().getText();
+            line_2 = line_2.substring(1,line_2.length()-1);
+            int line_1_index = get_where_index(line_1,table_name);
+            if(operator.equalsIgnoreCase("like") && get_column_type(line_1,table_name).equalsIgnoreCase("string"))
+            {
+                Final_Path = handle_like_stmt(Folder_Path,line_1_index,line_2,",");
+                return Final_Path;
+            }
+        }
+        catch(Exception e )
+        {}
+        return Folder_Path ;
+    }
+
+    public String handle_like_stmt(String path , int index , String comp_string , String Delimiter)
+    {
+        String out_String = "" ;
+        if(path != null)
+        {
+            String out_path = "";
+            String in_path = "" ;
+            File folder = new File(path);
+            File[] listOfFiles = folder.listFiles();
+            File out_dir = new File(path+"\\temp");
+            out_String = path+"\\temp" ;
+            out_dir.mkdirs();
+            for (File listOfFile : listOfFiles)
+            {
+                if (listOfFile.isFile())
+                {
+                    in_path = listOfFile.getPath();
+                    out_path = out_dir+"\\"+listOfFile.getName()+"_where_handle_temp.txt";
+                    BufferedReader fileReader = null;
+                    String[] tokens = null ;
+                    String line ;
+                    try
+                    {
+                        fileReader = new BufferedReader(new FileReader(in_path));
+                        File file = new File(out_path);
+                        FileWriter fr = new FileWriter(file, true);
+                        BufferedWriter br = new BufferedWriter(fr);
+                        while ((line = fileReader.readLine()) != null)
+                        {
+                            tokens = line.split(Delimiter);
+                            if(comp_string.charAt(0) == '%') // ends with
+                            {
+                                if(compare_like_stmt(comp_string,tokens[index],2))
+                                {
+                                    br.write(line);
+                                    br.newLine();
+                                }
+                            }
+                            else if(comp_string.charAt(comp_string.length()-1) == '%') // starts with
+                            {
+                                if(compare_like_stmt(comp_string,tokens[index],1))
+                                {
+                                    br.write(line);
+                                    br.newLine();
+                                }
+                            }
+                            else
+                            {
+                                if(tokens[index].equals(comp_string))
+                                {
+                                    br.write(line);
+                                    br.newLine();
+                                }
+                            }
+                        }
+                        br.close();
+                        fr.close();
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    finally {
+                        try {
+                            fileReader.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }else
+        {
+            System.out.println("data Type path not Found !! ");
+            return null ;
+        }
+        return out_String ;
+    }
+
+    public boolean compare_like_stmt(String one , String two , int operation )
+    // operation = 1 => string one starts with string two || operation = 2 => string one ends with string two
+    {
+        switch(operation)
+        {
+            case 1 :
+            {
+                try{
+                for ( int i = 0 ; i < one.length()-1 ; i ++ )
+                {
+                    if(one.charAt(i) == two.charAt(i)) // might cause an out of bound exception
+                    {}
+                    else
+                    {return false;}
+                }
+                return true;
+                }catch(ArrayIndexOutOfBoundsException e ){return true;}
+                catch(Exception ee ){
+                    System.out.println("another exception");
+                    return false ;
+                }
+            }
+            case 2 :
+            {
+                    int one_counter = one.length()-1;int two_counter = two.length()-1;
+                    while(one_counter != 0 )
+                    {
+                        if(one.charAt(one_counter) == two.charAt(two_counter))
+                        {
+                            one_counter--;two_counter--;
+                        }
+                        else{return false ; }
+                    }
+                    return true ;
+            }
+        }
+        return false ;
+    }
+
     public int stringCompare(String str1, String str2)
     {
         try{
@@ -214,25 +343,6 @@ public class Visitor   extends gBaseVisitor<Object> {
             System.out.println("error at class visitor : stringcompare - type missmatch error");
             return -2 ;
         }
-        /*int l1 = str1.length();
-        int l2 = str2.length();
-        int lmin = Math.min(l1, l2);
-
-        for (int i = 0; i < lmin; i++) {
-            int str1_ch = (int)str1.charAt(i);
-            int str2_ch = (int)str2.charAt(i);
-
-            if (str1_ch != str2_ch) {
-                return str1_ch - str2_ch;
-            }
-        }
-
-        if (l1 != l2) {
-            return l1 - l2;
-        }
-        else {
-            return 0;
-        }*/
     }
 
     public String handle_where_clause_binary(String path , int index1 , int index2 , String operator , String Delimiter)
@@ -301,6 +411,9 @@ public class Visitor   extends gBaseVisitor<Object> {
                                         br.write(line);
                                         br.newLine();
                                     }
+                                    break ;
+                                case "like" :
+                                    System.out.println("like clause binary ");
                                     break ;
                             }
                         }
@@ -395,6 +508,9 @@ public class Visitor   extends gBaseVisitor<Object> {
                                         br.newLine();
                                     }
                                     break ;
+                                case "like" :
+                                    System.out.println("like clause unary");
+                                    break ;
                             }
                         }
                         br.close();
@@ -450,6 +566,30 @@ public class Visitor   extends gBaseVisitor<Object> {
         System.out.println("error : Data Type not found returning NULL as file path ");
         System.out.println("error trace : at String get_dir(String DTName)");
         return null  ;
+    }
+
+    public String get_column_type(String Name , String DTName)
+    {
+        Data_Type dt = new Data_Type() ;
+        for (Object Data_Type : launch.Data_Types) {
+            dt = (Data_Type) Data_Type;
+            if(dt.name.equalsIgnoreCase(DTName))
+            {
+                ArrayList as = dt.names ;
+                ArrayList types = dt.vars;
+                String name =  Name;
+                for(int j = 0 ; j < as.size() ; j ++ )
+                {
+                    if(as.get(j).equals(name))
+                    {
+                        String result = (String)types.get(j);
+                        return result;
+                    }
+                }
+                break ;
+            }
+        }
+        return null ;
     }
 
     public int get_where_index(String Name , String DTName)
@@ -582,8 +722,10 @@ public class Visitor   extends gBaseVisitor<Object> {
         }
     }
 
-    public boolean exist(String path )
+    public String reduce(String path , String function) // apply the function the return the result folder path
     {
-        return (new File(path)).exists();
+
+        return null ;
     }
+
 }
